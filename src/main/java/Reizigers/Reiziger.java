@@ -1,6 +1,9 @@
 package Reizigers;
 
 import java.time.LocalDate;
+
+import Adres.Adres;
+
 import java.sql.Date;
 
 public class Reiziger {
@@ -9,6 +12,7 @@ public class Reiziger {
     private String tussenvoegsels;
     private String achternaam;
     private Date geboortedatum;
+    private Adres adres;
 
     public Reiziger(int id, String vl, String tv, String an, Date gbdtm) {
         this.id = id;
@@ -53,6 +57,14 @@ public class Reiziger {
         this.geboortedatum = geboortedatum;
     }
 
+    public Adres getAdres() {
+        return adres;
+    }
+
+    public void setAdres(Adres adres) {
+        this.adres = adres;
+    }
+
     public String getNaam() {
         String voorl = this.voorletters;
         String tussenv = this.tussenvoegsels;
@@ -66,6 +78,8 @@ public class Reiziger {
     }
 
     public String toString() {
-        return "#" + this.id + " " + getNaam() + " (" + this.geboortedatum + ")";
+        String reizigerString = "Reiziger #" + this.id + " " + getNaam() + ", geb." + this.geboortedatum;
+        String adresString = ", " + this.adres.getStraat() + " " + this.adres.getHuisnummer() + " (" + this.adres.getPostcode() + ")";
+        return reizigerString + adresString;
     }
 }
