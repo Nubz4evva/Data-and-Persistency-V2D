@@ -3,8 +3,10 @@ package Reizigers;
 import java.time.LocalDate;
 
 import Adres.Adres;
+import OVChipkaart.OVChipkaart;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 public class Reiziger {
     private int id;
@@ -13,6 +15,7 @@ public class Reiziger {
     private String achternaam;
     private Date geboortedatum;
     private Adres adres;
+    private ArrayList<OVChipkaart> OVChipkaarten;
 
     public Reiziger(int id, String vl, String tv, String an, Date gbdtm) {
         this.id = id;
@@ -63,6 +66,14 @@ public class Reiziger {
 
     public void setAdres(Adres adres) {
         this.adres = adres;
+    }
+
+    public ArrayList<OVChipkaart> getOVChipkaarten() {
+        return OVChipkaarten;
+    }
+
+    public void setOVChipkaarten(ArrayList<OVChipkaart> OVChipkaarten) {
+        this.OVChipkaarten = OVChipkaarten;
     }
 
     public String getNaam() {
