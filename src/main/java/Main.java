@@ -1,3 +1,7 @@
+import OVChipkaart.OVChipkaart;
+import OVChipkaart.OVChipkaartDAOsql;
+import Product.Product;
+import Product.ProductDAOsql;
 import Reizigers.Reiziger;
 import Reizigers.ReizigerDAO;
 import Reizigers.ReizigerDAOsql;
@@ -12,58 +16,58 @@ import Adres.AdresDAOsql;
 public class Main {
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/ovchip", "postgres", "postgres");
+        OVChipkaartDAOsql ovdao = new OVChipkaartDAOsql(conn);
+        ProductDAOsql pdao = new ProductDAOsql(conn);
         ReizigerDAOsql rdao = new ReizigerDAOsql(conn);
-        AdresDAOsql adao = new AdresDAOsql(conn);
-        testP3(rdao, adao);
+        testP5(ovdao, pdao, rdao);
     }
 
 
-    private static void testP3(ReizigerDAO rdao, AdresDAOsql adao) throws SQLException {
-        System.out.println("\n---------- Test P3 -------------");
+    private static void testP5(OVChipkaartDAOsql ovdao, ProductDAOsql pdao, ReizigerDAOsql rdao) throws SQLException {
+        System.out.println("\n---------- Test P4 -------------");
 
-        // Haal alle reizigers op uit de database
-        List<Reiziger> reizigers = rdao.findAll();
-        System.out.println("[Test] Reizigers.ReizigerDAO.findAll() geeft de volgende reizigers en adressen:\n");
-        for (Reiziger r : reizigers) {
-            System.out.println(r);
+        // Haal alle producten op uit de database
+        List<Product> producten = pdao.findAll();
+        System.out.println("[Test] pdao.findAll() geeft de volgende producten:\n");
+        for (Product p : producten) {
+            System.out.println(p);
         }
         System.out.println();
 
-        // Maak een nieuwe reiziger en adres aan en persisteer deze in de database
-        String gbdatum = "1981-03-14";
-        Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
-        Adres adres = new Adres(106, "3853SL", "24", "Leemkuul", "Ermelo", 77);
-        sietske.setAdres(adres);
-        rdao.save(sietske);
-        reizigers = rdao.findAll();
-
-        // Vind Sietske op basis van id
-        System.out.println("[Test] Save + findById geeft de volgende reiziger en adres:\n");
-        Reiziger reizigerById = rdao.findById(77);
-        System.out.println(reizigerById + "\n");
-        System.out.println();
-
-        // Vind Reizigers op basis van geboortedatum
-        System.out.println("[Test] findByGbdatum geeft de volgende reizigers en adressen:\n");
-        List<Reiziger> reizigers1 = rdao.findByGbdatum(gbdatum);
-        for (Reiziger r : reizigers1) {
-            System.out.println(r +"\n");
+        Reiziger reiziger = rdao.findById(2);
+        OVChipkaart ovChipkaart = reiziger.getOVChipkaarten().get(0);
+        // Haal producten op die bij de OVchipkaart horen
+        List<Product> OVproducten = pdao.findByOVChipkaart(ovChipkaart);
+        System.out.println("[Test] pdao.findByOVChipkaart() geeft de volgende producten:\n");
+        for (Product p : OVproducten) {
+            System.out.println(p);
         }
         System.out.println();
 
-        // Verander huisnummer Sietske
-        sietske.getAdres().setHuisnummer("26");
-        System.out.println("[Test] Update geeft de volgende output:\n");
-        rdao.update(sietske);
-        System.out.println(rdao.findById(77) + "\n");
+        // Maak nieuw product aan en sla deze op
+        Product newProduct = new Product(23, "Test", "Test123", 16.50);
+        ovChipkaart.addProduct(newProduct);
+        System.out.println("[Test] pdao.save() geeft eerst " + producten.size() + " producten:\n");
+        pdao.save(newProduct);
+        producten = pdao.findAll();
+        System.out.println("Erna, " +  producten.size() + " producten:\n");
+
+
+        // Update product
+        newProduct.setPrijs(12.50);
+        pdao.update(newProduct);
+        System.out.println("[Test] Update geeft de volgende producten:\n");
+        OVproducten = pdao.findByOVChipkaart(ovChipkaart);
+        for (Product p : OVproducten) {
+            System.out.println(p);
+        }
         System.out.println();
 
-        // Delete Sietske
-        List<Adres> adressen = adao.findAll();
-        System.out.println("[Test] Eerst " + reizigers.size() + " reizigers en " + adressen.size() + " adressen, na Delete :\n");
-        rdao.delete(sietske);
-        reizigers = rdao.findAll();
-        adressen = adao.findAll();
-        System.out.println(reizigers.size() + " reizigers en " + adressen.size() + " adressen \n");
+        // Delete product
+        producten = pdao.findAll();
+        System.out.println("[Test] Eerst " + producten.size() + " producten, na Delete :\n");
+        pdao.delete(newProduct);
+        producten = pdao.findAll();
+        System.out.println(producten.size() + " producten \n");
     }
 }
